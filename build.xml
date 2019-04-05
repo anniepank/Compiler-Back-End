@@ -1,0 +1,58 @@
+<project name="CA0 - provided ANT build file" default="run-java-all" basedir=".">
+	<description>
+		Compile and run provided Java programs.
+		Students should extend this ANT build file to execute MIPS
+		assembler files using MARS.
+		M. Taschwer, March 2018.
+	</description>
+	
+	<!-- list of Java classes to compile and execute -->
+	<property name="classlist" value="Task2,Task3,Task4"/>
+
+	<!-- source and build directories (need not be modified) -->
+	<property name="srcdir" location="."/>
+	<property name="builddir" location="classes"/>
+
+	<!-- Java class to execute (may be overriden from command line or by antcall target) -->
+	<property name="javaclass" value="Task2"/>
+
+	<!-- ant-contrib package providing <for> ANT task etc. -->
+	<property name="ant-contrib-jar" location="ant-contrib.jar"/>
+
+	<taskdef resource="net/sf/antcontrib/antlib.xml">
+		<classpath>
+		    <pathelement location="${ant-contrib-jar}"/>
+		</classpath>
+	</taskdef>
+
+	<target name="mkdirs" description="create build directory">
+		<mkdir dir="${builddir}"/>
+	</target>
+
+	<target name="compile-java" depends="mkdirs"
+			description="compile all Java classes in this directory">
+		<javac srcdir="${srcdir}" destdir="${builddir}" debug="on" includeantruntime="false">
+			<include name="*.java"/>
+		</javac>
+	</target>
+
+	<target name="run-java" depends="compile-java" description="execute 'javaclass'">
+		<java classname="${javaclass}" classpath="${builddir}" fork="true"/>
+	</target>
+
+	<target name="run-java-all" description="execute all Java classes listed in 'classlist'">
+		<for param="classname" list="${classlist}">
+			<sequential>
+				<echo>Running @{classname} ...</echo>
+				<antcall target="run-java">
+					<param name="javaclass" value="@{classname}"/>
+				</antcall>
+			</sequential>
+		</for>
+	</target>
+
+	<target name="clean" description="remove build directory">
+		<delete dir="${builddir}"/>
+	</target>
+	
+</project>
